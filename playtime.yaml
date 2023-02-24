@@ -59,10 +59,10 @@ paths:
           in: query
           description: Filter games by minimum rating
           schema:
-            type: integer
+            type: number
             minimum: 0
-            maximum: 100
-            example: 80
+            maximum: 5
+            example: 4.45
           required: false
         - name: store
           in: query
@@ -92,9 +92,9 @@ paths:
                           type: string
                           nullable: true
                         rating:
-                          type: integer
+                          type: number
                           minimum: 0
-                          maximum: 100
+                          maximum: 5
                         media:
                           type: object
                           properties:
@@ -273,9 +273,9 @@ components:
           type: string
           nullable: true
         rating:
-          type: integer
+          type: number
           minimum: 0
-          maximum: 100
+          maximum: 5
         media:
           type: object
           properties:
