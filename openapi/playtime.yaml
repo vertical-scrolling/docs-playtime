@@ -1,0 +1,311 @@
+openapi: 3.0.0
+info:
+  title: PlayTime API
+  version: 1.0.0
+  description: API that provides the core functionalities for both the Android and iOS PlayTime apps.
+servers:
+  - url: https://playtime.fly.dev/
+tags:
+  - name: games
+    description: Operations that affect to the `games` resource
+  - name: genres
+    description: Operations that affect to the `genres` resource
+  - name: platforms
+    description: Operations that affect to the `platforms` resource
+  - name: stores
+    description: Operations that affect to the `stores` resource
+security:
+  - {}
+paths:
+  "/{version}/games":
+    parameters:
+      - $ref: "#/components/parameters/version"
+    get:
+      operationId: getGames
+      description: Get the list of games
+      tags:
+        - games
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/pageSize"
+        - name: ordering
+          in: query
+          description: Order games by a given criteria
+          schema:
+            enum:
+              - "name"
+              - "-name"
+              - "rating"
+              - "-rating"
+              - "released"
+              - "-released"
+            default: "rating"
+          required: false
+        - name: genre
+          in: query
+          description: Filter games by genre id
+          schema:
+            type: string
+            example: "4"
+          required: false
+        - name: platform
+          in: query
+          description: Filter games by platform id
+          schema:
+            type: string
+            example: "4"
+          required: false
+        - name: rating
+          in: query
+          description: Filter games by minimum rating
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100
+            example: 80
+          required: false
+        - name: store
+          in: query
+          description: Filter games by store id
+          schema:
+            type: string
+            example: "4"
+          required: false
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  games:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        released:
+                          type: string
+                          nullable: true
+                        rating:
+                          type: integer
+                          minimum: 0
+                          maximum: 100
+                        media:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+        default:
+          description: "Unexpected error"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  "/{version}/genres":
+    parameters:
+      - $ref: "#/components/parameters/version"
+    get:
+      operationId: getGenres
+      description: Get the list of genres
+      tags:
+        - genres
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/pageSize"
+        - name: ordering
+          in: query
+          description: Order stores by a given criteria
+          schema:
+            enum:
+              - "games_count"
+              - "-games_count"
+            default: "games_count"
+          required: false
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  genres:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Genre"
+        default:
+          description: "Unexpected error"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  "/{version}/platforms":
+    parameters:
+      - $ref: "#/components/parameters/version"
+    get:
+      operationId: getPlatforms
+      description: Get the list of platforms
+      tags:
+        - platforms
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/pageSize"
+        - name: ordering
+          in: query
+          description: Order stores by a given criteria
+          schema:
+            enum:
+              - "games_count"
+              - "-games_count"
+            default: "games_count"
+          required: false
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  platforms:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Platform"
+        default:
+          description: "Unexpected error"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  "/{version}/stores":
+    parameters:
+      - $ref: "#/components/parameters/version"
+    get:
+      operationId: getStores
+      description: Get the list of stores
+      tags:
+        - stores
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/pageSize"
+        - name: ordering
+          in: query
+          description: Order stores by a given criteria
+          schema:
+            enum:
+              - "games_count"
+              - "-games_count"
+            default: "games_count"
+          required: false
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stores:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Store"
+        default:
+          description: "Unexpected error"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  parameters:
+    version:
+      name: version
+      in: path
+      description: "API's version"
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      required: true
+    page:
+      name: page
+      in: query
+      description: Page number of the paginated result
+      schema:
+        type: integer
+        minimum: 1
+        example: 3
+        default: 1
+      required: false
+    pageSize:
+      name: pageSize
+      in: query
+      description: Number of elements in each page of the paginated result
+      schema:
+        type: integer
+        minimum: 1
+        example: 20
+      required: false
+  schemas:
+    Error:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+    Game:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        released:
+          type: string
+          nullable: true
+        rating:
+          type: integer
+          minimum: 0
+          maximum: 100
+        media:
+          type: object
+          properties:
+            url:
+              type: string
+        playtime:
+          type: integer
+          description: Estimated time to beat the game (in hours)
+        platforms:
+          type: array
+          items:
+            $ref: "#/components/schemas/Platform"
+    Genre:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    Platform:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    Store:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
