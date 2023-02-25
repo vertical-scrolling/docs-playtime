@@ -14,6 +14,8 @@ tags:
     description: Operations that affect to the `platforms` resource
   - name: stores
     description: Operations that affect to the `stores` resource
+  - name: users
+    description: Operations that affect to the `users` resource
 security:
   - {}
 paths:
@@ -106,6 +108,22 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Error"
+  "/{version}/games/{gameId}":
+    parameters:
+      - $ref: "#/components/parameters/version"
+      - $ref: "#/components/parameters/gameId"
+    get:
+      operationId: getGame
+      description: Get a game by id
+      tags:
+        - games
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Game"
   "/{version}/genres":
     parameters:
       - $ref: "#/components/parameters/version"
@@ -220,6 +238,58 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Error"
+  "/{version}/users/{userId}":
+    parameters:
+      - $ref: "#/components/parameters/version"
+      - $ref: "#/components/parameters/userId"
+    get:
+      operationId: getUser
+      description: Gets a user by id
+      tags:
+        - users
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        default:
+          description: "Unexpected error"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  "/{version}/users/{userId}/games/{gameId}":
+    parameters:
+      - $ref: "#/components/parameters/version"
+      - $ref: "#/components/parameters/userId"
+      - $ref: "#/components/parameters/gameId"
+    put:
+      operationId: setGameStatus
+      description: Sets a game status for a given user
+      tags:
+        - users
+        - games
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  enum:
+                    - "completed"
+                    - "not_played"
+      responses:
+        204:
+          description: "No Content"
+        default:
+          description: "Unexpected error"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   parameters:
     version:
@@ -230,6 +300,20 @@ components:
         type: integer
         minimum: 1
         default: 1
+      required: true
+    gameId:
+      name: gameId
+      in: path
+      description: "Game's id"
+      schema:
+        type: string
+      required: true
+    userId:
+      name: userId
+      in: path
+      description: "User's id"
+      schema:
+        type: string
       required: true
     page:
       name: page
@@ -284,10 +368,6 @@ components:
         playtime:
           type: integer
           description: Estimated time to beat the game (in hours)
-        platforms:
-          type: array
-          items:
-            $ref: "#/components/schemas/Platform"
     Genre:
       type: object
       properties:
@@ -309,3 +389,18 @@ components:
           type: string
         name:
           type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        media:
+          type: object
+          properties:
+            url:
+              type: string
+        playtime:
+          type: integer
+          minimum: 0
